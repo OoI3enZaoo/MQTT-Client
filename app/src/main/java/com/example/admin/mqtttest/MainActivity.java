@@ -1,9 +1,12 @@
 package com.example.admin.mqtttest;
 
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import net.sf.xenqtt.client.AsyncClientListener;
 import net.sf.xenqtt.client.AsyncMqttClient;
@@ -40,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = null;
     private String sssn = "admin";
     private String topic = "aparcas_raw";
+    private TextView tstamp;
+    public String text ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
         Log.i("ben", "onCreate (2)");
         mqttThreadHT.put(sssn, mqttThread);
         Log.i("ben", "onCreate (3)");
+        tstamp = (TextView)findViewById(R.id.txtTime);
+        tstamp.setText("");
+
     }
     private MqttThread createMQTTThread(final String sssn, final String topic) {
         return new MqttThread() {
@@ -67,18 +75,28 @@ public class MainActivity extends AppCompatActivity {
                     public void publishReceived(MqttClient client, final PublishMessage message) {
 
                         final PublishMessage msg = message;
+                        Data data = new Data();
                         String mMsg = msg.getPayloadString().toString();
+                        //tstamp.setText("");
+                        //text = data.getLat();
+
                         try {
-                            Data data = new Data();
+
                             Log.i("ben", "publishReceived: " +mMsg);
                             data.setData(mMsg);
-                            Log.i("ben", "publishReceived2: " + data.getLat());
+
+                            Log.i("ben", "publishReceived: " +data.getLat());
+
+
 
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
+
+                        tstamp.setText(tstamp.getText() +  "\n"  +data.getLat());
+                        Toast.makeText(getApplicationContext(), "tstamp: ", Toast.LENGTH_SHORT).show();
                         message.ack();
                     }
                     @Override
